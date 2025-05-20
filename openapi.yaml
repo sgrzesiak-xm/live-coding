@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Mock API for Orders
+  description: This is a mock API for handling orders with basic validation and operations like GET, POST, and DELETE.
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/data
+    description: Mock API server
+paths:
+  /:
+    get:
+      summary: Retrieve all orders or a specific order by ID
+      description: |
+        Retrieve a list of all orders or a specific order if an ID is provided in the query string.
+      parameters:
+        - name: id
+          in: query
+          description: The order ID to retrieve (optional).
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved orders or order.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    volume:
+                      type: integer
+                      description: The order volume.
+                    symbol:
+                      type: string
+                      description: The symbol for the order (e.g., EURUSD).
+                    price:
+                      type: number
+                      format: float
+                      description: The order price with 5 decimal points.
+                    direction:
+                      type: string
+                      enum:
+                        - BUY
+                        - SELL
+                      description: The order direction.
+        '400':
+          description: Bad request, the order ID must be an integer.
+        '404':
+          description: Order not found or invalid URL.
+    post:
+      summary: Create a new order
+      description: |
+        Create a new order by providing the order details as JSON in the request body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                volume:
+                  type: integer
+                  description: The order volume. Must be greater than 0.
+                symbol:
+                  type: string
+                  description: The symbol for the order. Allowed symbols "EURUSD", "USDEUR", "JPYUSD"
+                price:
+                  type: number
+                  format: float
+                  description: The order price, should have 5 decimal points.
+                direction:
+                  type: string
+                  enum:
+                    - BUY
+                    - SELL
+                  description: The order direction BUY or SELL.
+      responses:
+        '200':
+          description: Successfully created an order.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  OrderID:
+                    type: integer
+                    description: The ID of the created order.
+        '400':
+          description: Invalid order payload. Missing required fields or invalid values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Volume must be an integer greater than 0, Invalid symbol, Price must be a number and have 5 decimal points"
+        '404':
+          description: Not found if the URL is incorrect.
+    delete:
+      summary: Delete an order by ID
+      description: |
+        Delete an existing order by providing the order ID in the request body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The order ID to be deleted.
+      responses:
+        '200':
+          description: Successfully deleted the order.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order deleted"
+        '400':
+          description: Bad request. Missing or invalid ID.
+        '404':
+          description: Order not found.
+
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        volume:
+          type: integer
+          description: The volume of the order. Must be an integer greater than 0.
+        symbol:
+          type: string
+          description: The currency pair for the order. Allowed symbols "EURUSD", "USDEUR", "JPYUSD".
+        price:
+          type: number
+          format: float
+          description: The price with 5 decimal points.
+        direction:
+          type: string
+          enum:
+            - BUY
+            - SELL
+          description: The order direction (BUY or SELL).
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message returned by the API.
