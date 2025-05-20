@@ -99,20 +99,18 @@ paths:
                     example: "Volume must be an integer greater than 0, Invalid symbol, Price must be a number and have 5 decimal points"
         '404':
           description: Not found if the URL is incorrect.
+  /{orderId}:
     delete:
       summary: Delete an order by ID
       description: |
-        Delete an existing order by providing the order ID in the request body.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  description: The order ID to be deleted.
+        Delete an existing order by providing the order ID as a path parameter.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: The ID of the order to delete.
+          schema:
+            type: integer
       responses:
         '200':
           description: Successfully deleted the order.
@@ -125,7 +123,7 @@ paths:
                     type: string
                     example: "Order deleted"
         '400':
-          description: Bad request. Missing or invalid ID.
+          description: Bad request. ID must be an integer.
         '404':
           description: Order not found.
 

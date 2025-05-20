@@ -70,15 +70,22 @@ class RequestMock:
 
         return MockResponse(status_code=200, json_data={"OrderID": order_id})
 
-    def delete(self, url: str, json: Optional[dict] = None) -> MockResponse:
-        if url != self.__url:
+    def delete(self, url: str) -> MockResponse:
+        if not url.startswith(self.__url):
             return MockResponse(status_code=404, message="Not Found")
 
-        if not json or not (order_id := json.get('id')):
-            return MockResponse(status_code=400, message="Bad Request. ID is required")
+        parsed_url = urlparse(url)
+        if not parsed_url.path:
+            return MockResponse(status_code=404, message="Not Found")
 
-        if not isinstance(order_id, int):
+        split_path = parsed_url.path.split("/")
+        if len(split_path) != 3:
+            return MockResponse(status_code=404, message="Not Found")
+
+        if not split_path[-1].isdigit():
             return MockResponse(status_code=400, message="Bad Request. ID must be an integer")
+
+        order_id = int(split_path[-1])
 
         if order_id not in self.__db:
             return MockResponse(status_code=404, message="Order not found")
