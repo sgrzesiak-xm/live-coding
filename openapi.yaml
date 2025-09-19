@@ -9,9 +9,9 @@ servers:
 paths:
   /:
     get:
-      summary: Retrieve all orders or a specific order by ID
+      summary: Retrieve all orders or a specific order if query parameter <id> was used
       description: |
-        Retrieve a list of all orders or a specific order if an ID is provided in the query string.
+        Retrieve all orders or a specific order if an ID is provided in the query string.
       parameters:
         - name: id
           in: query
@@ -21,13 +21,29 @@ paths:
             type: integer
       responses:
         '200':
-          description: Successfully retrieved orders or order.
+          description: Successfully retrieved all orders.
           content:
             application/json:
               schema:
                 type: object
                 additionalProperties:
                   $ref: '#/components/schemas/Order'
+              example:
+                OrderId1:
+                  volume: 1
+                  symbol: "EURUSD"
+                  price: 1.23456
+                  direction: "BUY"
+                OrderId2:
+                  volume: 10
+                  symbol: "USDEUR"
+                  price: 0.98765
+                  direction: "SELL"
+                OrderId3:
+                  volume: 5
+                  symbol: "JPYUSD"
+                  price: 123.45001
+                  direction: "BUY"
         '400':
           description: Bad request, the order ID must be an integer.
           content:
